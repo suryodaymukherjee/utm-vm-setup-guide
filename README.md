@@ -1,4 +1,4 @@
-# Ubuntu VM Setup Guide for macOS
+# Ubuntu VM Setup Guide for macOS using UTM
 
 This guide provides step-by-step instructions for setting up an Ubuntu Virtual Machine (VM) on macOS using UTM. It also includes instructions for mounting a shared folder between macOS and the VM, and configuring a static IP address for the VM using a bridged network.
 
