@@ -46,6 +46,25 @@ This guide provides step-by-step instructions for setting up an Ubuntu Virtual M
 
 To share files between macOS and the Ubuntu VM, you can use one of the following methods: Virtio-FS or SPICE WebDAV. Both methods allow seamless file sharing between the host and the VM.
 
+#### Prerequisites
+
+Before proceeding with mounting a shared folder, ensure the following:
+
+1. **Enable Clipboard Sharing**:
+   - Open UTM and select your Ubuntu VM.
+   - Click on the `Edit` button to access the VM settings.
+   - Navigate to the `Sharing` tab and enable the `Clipboard Sharing` option.
+
+   ![Enable Clipboard Sharing](UTM_Screenshot_for_shared_Folder.png)
+
+2. **Select the Directory Sharing Mode**:
+   - In the `Sharing` tab, choose the directory sharing mode:
+     - **VirtFS**: For high-performance file sharing.
+     - **SPICE WebDAV**: For compatibility and ease of use.
+
+
+
+
 #### Method 1: Virtio-FS
 
 Virtio-FS is a high-performance file-sharing mechanism that allows direct access to a shared directory on the host system.
@@ -54,7 +73,7 @@ Virtio-FS is a high-performance file-sharing mechanism that allows direct access
    - Open UTM and select your Ubuntu VM.
    - Click on the `Edit` button to access the VM settings.
    - Navigate to the `Sharing` tab.
-   - Enable the `Virtio-FS` option and click the `+` button to add a folder.
+   - Enable the `Virtio-FS` option and click the `Browse...` button to add a folder.
    - Select the folder on macOS that you want to share with the VM.
 
 2. **Install Required Packages in Ubuntu**:
@@ -96,7 +115,7 @@ SPICE WebDAV allows mounting WebDAV shares as filesystems, enabling seamless fil
    - Open UTM and select your Ubuntu VM.
    - Click on the `Edit` button to access the VM settings.
    - Navigate to the `Sharing` tab.
-   - Enable the `SPICE WebDAV` option and click the `+` button to add a folder.
+   - Enable the `SPICE WebDAV` option and click the `Browse...` button to add a folder.
    - Select the folder on macOS that you want to share with the VM.
 
 2. **Install Required Packages**:
