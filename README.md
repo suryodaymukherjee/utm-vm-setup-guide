@@ -42,29 +42,127 @@ This guide provides step-by-step instructions for setting up an Ubuntu Virtual M
    - Follow the on-screen instructions to install Ubuntu.
    - During installation, choose the default options unless you have specific requirements.
 
-### Screenshots for Reference
-
-#### UTM Main Interface
-![UTM Main Interface](https://mac.getutm.app/images/screenshots/utm-main.png)
-
-#### VM Configuration
-![VM Configuration](https://mac.getutm.app/images/screenshots/utm-config.png)
-
-#### Ubuntu Installation
-![Ubuntu Installation](https://ubuntu.com/tutorials/install-ubuntu-desktop/_files/ubuntu-installation.png)
-
-These screenshots are sourced from the official UTM and Ubuntu websites for better clarity.
-
 ### 3. Mount a Shared Folder
-To share files between macOS and the Ubuntu VM:
-1. In UTM, go to the VM settings and enable the `Shared Directory` option.
-2. Specify the folder on macOS that you want to share.
-3. Inside the Ubuntu VM, install the `spice-vdagent` package:
-   ```bash
-   sudo apt update
-   sudo apt install spice-vdagent
-   ```
-4. Restart the VM and access the shared folder under `/media` or `/mnt`.
+
+To share files between macOS and the Ubuntu VM, you can use one of the following methods: Virtio-FS or SPICE WebDAV. Both methods allow seamless file sharing between the host and the VM.
+
+#### Method 1: Virtio-FS
+
+Virtio-FS is a high-performance file-sharing mechanism that allows direct access to a shared directory on the host system.
+
+1. **Enable Virtio-FS in UTM**:
+   - Open UTM and select your Ubuntu VM.
+   - Click on the `Edit` button to access the VM settings.
+   - Navigate to the `Sharing` tab.
+   - Enable the `Virtio-FS` option and click the `+` button to add a folder.
+   - Select the folder on macOS that you want to share with the VM.
+
+2. **Install Required Packages in Ubuntu**:
+   - Start the Ubuntu VM and open a terminal.
+   - Update the package list:
+     ```bash
+     sudo apt update
+     ```
+   - Install the `virtiofsd` package:
+     ```bash
+     sudo apt install virtiofsd
+     ```
+
+3. **Mount the Shared Folder in Ubuntu**:
+   - Create a mount point for the shared folder:
+     ```bash
+     sudo mkdir /mnt/shared
+     ```
+   - Mount the shared folder using the `virtiofs` driver:
+     ```bash
+     sudo mount -t virtiofs shared /mnt/shared
+     ```
+   - Verify the folder's contents:
+     ```bash
+     ls /mnt/shared
+     ```
+
+4. **Automate Mounting (Optional)**:
+   - Add the following entry to `/etc/fstab` to mount the folder automatically on boot:
+     ```
+     shared /mnt/shared virtiofs defaults 0 0
+     ```
+
+#### Method 2: SPICE WebDAV
+
+SPICE WebDAV allows mounting WebDAV shares as filesystems, enabling seamless file sharing between macOS and the Ubuntu VM.
+
+1. **Enable SPICE WebDAV in UTM**:
+   - Open UTM and select your Ubuntu VM.
+   - Click on the `Edit` button to access the VM settings.
+   - Navigate to the `Sharing` tab.
+   - Enable the `SPICE WebDAV` option and click the `+` button to add a folder.
+   - Select the folder on macOS that you want to share with the VM.
+
+2. **Install Required Packages**:
+   - Update the package list:
+     ```bash
+     sudo apt update
+     ```
+   - Install the necessary packages:
+     ```bash
+     sudo apt install spice-vdagent spice-webdavd davfs2
+     ```
+
+3. **Create a Mount Point**:
+   - Create a directory to serve as the mount point for the shared folder:
+     ```bash
+     mkdir -p ~/shared
+     ```
+
+4. **Start the WebDAV Daemon**:
+   - Enable the SPICE WebDAV service to start on boot:
+     ```bash
+     sudo systemctl enable spice-webdavd
+     ```
+   - Start the service immediately:
+     ```bash
+     sudo systemctl start spice-webdavd
+     ```
+
+5. **Reboot the VM**:
+   - Reboot the VM to apply the changes:
+     ```bash
+     sudo reboot
+     ```
+
+6. **Mount the WebDAV Share**:
+   - Mount the WebDAV share to the created mount point:
+     ```bash
+     sudo mount -t davfs http://localhost:9843 ~/shared
+     ```
+
+7. **Optional: Automount on Boot**:
+   - To mount the WebDAV share automatically on boot, add the following line to `/etc/fstab`:
+     ```
+     http://localhost:9843 /home/yourusername/shared davfs user,noauto 0 0
+     ```
+   - Allow your user to mount it without `sudo`:
+     ```bash
+     sudo usermod -aG davfs2 yourusername
+     ```
+
+8. **Troubleshooting Tips**:
+   - If you encounter issues, ensure the shared folder is correctly configured in UTM.
+   - Verify the tag used for Virtio-FS (it should be `share`).
+   - Check if the SPICE WebDAV server is running:
+     ```bash
+     sudo systemctl status spice-webdavd
+     ```
+   - Use `dmesg` to check for errors:
+     ```bash
+     sudo dmesg | tail
+     ```
+   - Ensure the required packages are installed and up-to-date:
+     ```bash
+     sudo apt update
+     sudo apt upgrade
+     ```
 
 ### 4. Configure a Static IP Address
 To set up a static IP address for the VM using a bridged network:
